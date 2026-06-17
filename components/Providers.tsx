@@ -8,7 +8,7 @@ import {
   useParticipant,
 } from "@/components/ParticipantContext";
 import type { LeaderboardEntry, Participant } from "@/lib/types";
-import { createBrowserClient } from "@/lib/supabase/client";
+import { subscribeToTables } from "@/lib/supabase/realtime";
 
 function ParticipantGate({ children }: { children: React.ReactNode }) {
   const { participant, setParticipant, loading } = useParticipant();
@@ -72,23 +72,17 @@ export function useLeaderboard() {
   useEffect(() => {
     refresh();
 
-    const supabase = createBrowserClient();
-    const channel = supabase
-      .channel("leaderboard-updates")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "predictions" },
-        () => refresh()
-      )
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "matches" },
-        () => refresh()
-      )
-      .subscribe();
+    const unsubscribe = subscribeToTables(
+      "leaderboard-updates",
+      [
+        { event: "*", table: "predictions" },
+        { event: "UPDATE", table: "matches" },
+      ],
+      refresh
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      unsubscribe?.();
     };
   }, [refresh]);
 

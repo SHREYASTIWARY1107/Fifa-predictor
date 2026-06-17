@@ -8,7 +8,7 @@ import { MatchCard } from "@/components/MatchCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Match, Prediction } from "@/lib/types";
 import { STAGE_LABELS, STAGE_ORDER } from "@/lib/constants";
-import { createBrowserClient } from "@/lib/supabase/client";
+import { subscribeToTable } from "@/lib/supabase/realtime";
 
 export default function PredictPage() {
   const { participant } = useParticipant();
@@ -43,18 +43,15 @@ export default function PredictPage() {
   useEffect(() => {
     load();
 
-    const supabase = createBrowserClient();
-    const channel = supabase
-      .channel("predict-matches")
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "matches" },
-        () => load()
-      )
-      .subscribe();
+    const unsubscribe = subscribeToTable(
+      "predict-matches",
+      "matches",
+      "UPDATE",
+      load
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      unsubscribe?.();
     };
   }, [load]);
 

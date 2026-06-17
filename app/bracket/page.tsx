@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AppHeader, AppShell } from "@/components/AppShell";
 import { Bracket } from "@/components/Bracket";
 import type { Match } from "@/lib/types";
-import { createBrowserClient } from "@/lib/supabase/client";
+import { subscribeToTable } from "@/lib/supabase/realtime";
 
 export default function BracketPage() {
   const [matches, setMatches] = useState<Match[]>([]);
@@ -23,18 +23,15 @@ export default function BracketPage() {
 
     load();
 
-    const supabase = createBrowserClient();
-    const channel = supabase
-      .channel("bracket-matches")
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "matches" },
-        () => load()
-      )
-      .subscribe();
+    const unsubscribe = subscribeToTable(
+      "bracket-matches",
+      "matches",
+      "UPDATE",
+      load
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      unsubscribe?.();
     };
   }, []);
 
