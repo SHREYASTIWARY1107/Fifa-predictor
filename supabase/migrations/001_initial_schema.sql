@@ -157,5 +157,7 @@ create policy "matches_select" on matches
 create policy "predictions_select" on predictions
   for select to anon, authenticated using (true);
 
-grant select on leaderboard to anon, authenticated;
-grant usage on schema public to anon, authenticated;
+revoke execute on function public.recalculate_match_points(uuid) from anon, authenticated;
+alter function public.calculate_prediction_points(int,int,int,int) set search_path = public;
+alter publication supabase_realtime add table matches;
+alter publication supabase_realtime add table predictions;
