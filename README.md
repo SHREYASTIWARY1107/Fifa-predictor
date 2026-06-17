@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FIFA World Cup 2026 Friends Predictor
 
-## Getting Started
+Predict exact scores with friends — no accounts, just a league PIN and your display name.
 
-First, run the development server:
+## Stack
+
+- **Next.js** (App Router)
+- **Supabase** (Postgres)
+- **Render** (hosting)
+- Match data from [wcup2026.org](https://wcup2026.org/api/data.php?action=all)
+
+## Local setup
+
+1. Copy env file:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Fill in Supabase keys and league settings in `.env.local`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Install and run:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+4. Seed matches (after Supabase schema is applied):
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+curl -X POST http://localhost:3000/api/admin/seed \
+  -H "Authorization: Bearer YOUR_CRON_SECRET"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scoring
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **3 pts** — exact score
+- **1 pt** — correct result (win/draw/loss)
+- **0 pts** — wrong result
 
-## Deploy on Vercel
+Predictions lock at kickoff.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy (Render)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Build: `npm install && npm run build`
+- Start: `npm start`
+- Set env vars: `LEAGUE_PIN`, `CRON_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+
+Optional cron every 10 minutes:
+
+```bash
+curl -X POST -H "Authorization: Bearer $CRON_SECRET" $APP_URL/api/cron/sync-matches
+```
