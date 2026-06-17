@@ -1,17 +1,17 @@
-# Deploy on Tranquil's Render workspace:
-# https://dashboard.render.com → New → Blueprint → connect this repo
-# Or one-click: https://render.com/deploy?repo=https://github.com/SHREYASTIWARY1107/Fifa-predictor
-
 services:
   - type: web
     name: fifa-predictor
     runtime: node
     plan: free
     region: oregon
+    repo: https://github.com/SHREYASTIWARY1107/Fifa-predictor
     branch: main
     buildCommand: npm install && npm run build
     startCommand: npm start
+    healthCheckPath: /
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_SUPABASE_URL
@@ -19,7 +19,7 @@ services:
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZudXN4eHpoY3d0ZmJzZmt1aXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1NzM5MjIsImV4cCI6MjA5NDE0OTkyMn0.9T0quX3NqlIMBPtyQbT8LlV7AwgzAnscS429Hr4Mix8
       - key: LEAGUE_PIN
-        sync: false
+        value: "1234"
       - key: CRON_SECRET
         generateValue: true
       - key: SUPABASE_SERVICE_ROLE_KEY
