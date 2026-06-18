@@ -128,3 +128,92 @@
     @apply font-sans;
   }
 }
+
+@keyframes scoreSlam {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(12px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.03) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes cardFlipIn {
+  0% {
+    opacity: 0;
+    transform: perspective(400px) rotateX(-12deg) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(400px) rotateX(0) translateY(0);
+  }
+}
+
+@keyframes pointsFlashExact {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  40% {
+    background-color: oklch(0.72 0.17 155 / 25%);
+  }
+}
+
+@keyframes pointsFlashWin {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  40% {
+    background-color: oklch(0.72 0.17 155 / 12%);
+  }
+}
+
+@keyframes pointsFlashMiss {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  40% {
+    background-color: oklch(0.5 0 0 / 15%);
+  }
+}
+
+.reveal-score-slam {
+  animation: scoreSlam 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reveal-card-in {
+  animation: cardFlipIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reveal-flash-exact {
+  animation: pointsFlashExact 0.8s ease-out;
+  border-radius: 0.5rem;
+}
+
+.reveal-flash-win {
+  animation: pointsFlashWin 0.6s ease-out;
+  border-radius: 0.5rem;
+}
+
+.reveal-flash-miss {
+  animation: pointsFlashMiss 0.5s ease-out;
+  border-radius: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-score-slam,
+  .reveal-card-in,
+  .reveal-flash-exact,
+  .reveal-flash-win,
+  .reveal-flash-miss {
+    animation: none;
+  }
+}
