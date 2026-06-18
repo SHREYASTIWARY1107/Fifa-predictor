@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isPinVerified } from "@/lib/auth";
+import { isPinVerified, setParticipantSession } from "@/lib/auth";
 import { AVATAR_COLORS } from "@/lib/constants";
 import { createServiceClient } from "@/lib/supabase/server";
 
@@ -42,6 +42,8 @@ export async function POST(request: Request) {
       }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    await setParticipantSession(data.id);
 
     return NextResponse.json({ participant: data });
   } catch (error) {

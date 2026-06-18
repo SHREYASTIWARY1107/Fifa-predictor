@@ -1,6 +1,10 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
-import { PIN_COOKIE } from "@/lib/constants";
+import {
+  DEFAULT_RECLAIM_PASSWORD,
+  PARTICIPANT_COOKIE,
+  PIN_COOKIE,
+} from "@/lib/constants";
 
 export async function hashPin(pin: string) {
   return bcrypt.hash(pin, 10);
@@ -36,4 +40,34 @@ export function isAuthorizedCron(request: Request) {
 
 export function isAuthorizedAdmin(request: Request) {
   return isAuthorizedCron(request);
+}
+
+export async function getParticipantSessionId() {
+  const cookieStore = await cookies();
+  return cookieStore.get(PARTICIPANT_COOKIE)?.value ?? null;
+}
+
+export async function setParticipantSession(participantId: string) {
+  const cookieStore = await cookies();
+  cookieStore.set(PARTICIPANT_COOKIE, participantId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 90,
+    path: "/",
+  });
+}
+
+export async function verifyReclaimPassword(
+  password: string,
+  passwordHash: string | null
+) {
+  if (passwordHash) {
+    return verifyPin(password, passwordHash);
+  }
+  return password === DEFAULT_RECLAIM_PASSWORD;
+}
+
+export async function hashReclaimPassword(password: string = DEFAULT_RECLAIM_PASSWORD) {
+  return hashPin(password);
 }

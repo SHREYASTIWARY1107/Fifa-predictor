@@ -41,6 +41,7 @@ export interface Match {
   status: MatchStatus;
   home_score: number | null;
   away_score: number | null;
+  live_minute: number | null;
   synced_at: string | null;
 }
 

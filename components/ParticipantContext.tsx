@@ -23,23 +23,36 @@ interface ParticipantContextValue {
 
 const ParticipantContext = createContext<ParticipantContextValue | null>(null);
 
+async function fetchParticipantById(id: string): Promise<ParticipantState | null> {
+  const res = await fetch(`/api/participants/${id}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.participant ?? null;
+}
+
 export function ParticipantProvider({ children }: { children: React.ReactNode }) {
   const [participant, setParticipantState] = useState<ParticipantState | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const stored = localStorage.getItem(PARTICIPANT_STORAGE_KEY);
-      if (!stored) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        const res = await fetch(`/api/participants/${stored}`);
-        if (res.ok) {
-          const data = await res.json();
-          setParticipantState(data.participant);
+        const meRes = await fetch("/api/participants/me");
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          if (meData.participant) {
+            localStorage.setItem(PARTICIPANT_STORAGE_KEY, meData.participant.id);
+            setParticipantState(meData.participant);
+            return;
+          }
+        }
+
+        const stored = localStorage.getItem(PARTICIPANT_STORAGE_KEY);
+        if (!stored) return;
+
+        const loaded = await fetchParticipantById(stored);
+        if (loaded) {
+          setParticipantState(loaded);
         } else {
           localStorage.removeItem(PARTICIPANT_STORAGE_KEY);
         }
@@ -54,6 +67,7 @@ export function ParticipantProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const setParticipant = useCallback((value: ParticipantState) => {
+    localStorage.setItem(PARTICIPANT_STORAGE_KEY, value.id);
     setParticipantState(value);
   }, []);
 

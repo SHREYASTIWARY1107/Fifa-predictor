@@ -14,7 +14,9 @@ export const AVATAR_COLORS = [
 ];
 
 export const PIN_COOKIE = "fifa_pin_verified";
+export const PARTICIPANT_COOKIE = "fifa_participant_session";
 export const PARTICIPANT_STORAGE_KEY = "fifa_participant_id";
+export const DEFAULT_RECLAIM_PASSWORD = "12345678";
 
 export const STAGE_LABELS: Record<string, string> = {
   group: "Group Stage",

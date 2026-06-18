@@ -112,7 +112,8 @@ export function MatchCard({
     if (match.status === "live") {
       return (
         <Badge className="animate-pulse bg-red-500/20 text-red-300">
-          <Radio className="mr-1 h-3 w-3" /> LIVE
+          <Radio className="mr-1 h-3 w-3" />
+          LIVE{match.live_minute != null ? ` ${match.live_minute}'` : ""}
         </Badge>
       );
     }

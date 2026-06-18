@@ -50,10 +50,18 @@ export default function PredictPage() {
       load
     );
 
+    const timer = setInterval(load, 60_000);
+
     return () => {
       unsubscribe?.();
+      clearInterval(timer);
     };
   }, [load]);
+
+  const liveMatches = useMemo(
+    () => matches.filter((m) => m.status === "live"),
+    [matches]
+  );
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -114,13 +122,15 @@ export default function PredictPage() {
           <p className="text-center text-muted-foreground">Loading matches...</p>
         ) : (
           <Tabs defaultValue="today">
-            <TabsList className="mb-4 grid w-full grid-cols-3">
+            <TabsList className="mb-4 grid w-full grid-cols-4">
               <TabsTrigger value="today">Today</TabsTrigger>
+              <TabsTrigger value="live">Live</TabsTrigger>
               <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
               <TabsTrigger value="rounds">Rounds</TabsTrigger>
             </TabsList>
 
             <TabsContent value="today">{renderList(todayMatches, participant.id)}</TabsContent>
+            <TabsContent value="live">{renderList(liveMatches, participant.id)}</TabsContent>
             <TabsContent value="upcoming">{renderList(upcomingMatches, participant.id)}</TabsContent>
             <TabsContent value="rounds" className="space-y-6">
               {STAGE_ORDER.map((stage) => {

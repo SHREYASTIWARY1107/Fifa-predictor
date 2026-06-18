@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Trophy, Target, GitBranch, ListOrdered, Share2, Table2 } from "lucide-react";
+import { Trophy, Target, GitBranch, ListOrdered, Share2, Table2, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useParticipant } from "@/components/ParticipantContext";
 
 const NAV_ITEMS = [
   { href: "/", label: "Board", icon: Trophy },
@@ -51,6 +52,8 @@ export function AppHeader({
   title: string;
   subtitle?: string;
 }) {
+  const { participant } = useParticipant();
+
   function shareLeague() {
     const text = `Join our FIFA World Cup 2026 predictions!\n${window.location.origin}\nAsk the group for the PIN.`;
     navigator.clipboard.writeText(text);
@@ -69,9 +72,20 @@ export function AppHeader({
             <p className="text-sm text-muted-foreground">{subtitle}</p>
           ) : null}
         </div>
-        <Button variant="outline" size="icon" onClick={shareLeague}>
-          <Share2 className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={shareLeague}>
+            <Share2 className="h-4 w-4" />
+          </Button>
+          {participant ? (
+            <Link
+              href={`/player/${participant.id}`}
+              aria-label="My picks"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background hover:bg-muted"
+            >
+              <User className="h-4 w-4" />
+            </Link>
+          ) : null}
+        </div>
       </div>
     </header>
   );

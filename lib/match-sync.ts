@@ -38,6 +38,7 @@ export function mapWcupMatch(match: WcupMatch) {
     status,
     home_score: homeScore,
     away_score: awayScore,
+    live_minute: match.live_minute ?? null,
     synced_at: new Date().toISOString(),
   };
 }
